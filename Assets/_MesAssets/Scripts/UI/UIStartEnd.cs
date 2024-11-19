@@ -12,6 +12,7 @@ public class UIStartEnd : MonoBehaviour
     // Scene de fin
     [Header("Variables pour fin de partie")]
     [SerializeField] private TextMeshProUGUI _txtGameOver = default;
+    [SerializeField] private TextMeshProUGUI _txtRecord = default;
     [SerializeField] private TextMeshProUGUI _txtScoreFin = default;
     [SerializeField] private Button _buttonMenu = default;
     [SerializeField] private Button _buttonQuitter = default;
@@ -31,6 +32,25 @@ public class UIStartEnd : MonoBehaviour
         
         if(SceneManager.GetActiveScene().buildIndex == SceneManager.sceneCountInBuildSettings - 1)
         {
+            if (PlayerPrefs.HasKey("Record"))
+            {
+                //Comparer avec le pointage du joueur
+                if (GameManager.Instance.Score > PlayerPrefs.GetInt("Record"))
+                {
+                    PlayerPrefs.SetInt("Record", GameManager.Instance.Score);
+                    PlayerPrefs.Save();
+                    _txtRecord.text = "Record : 0";
+                    
+                }
+
+            }
+            else
+            {
+                PlayerPrefs.SetInt("Record", GameManager.Instance.Score);
+                PlayerPrefs.Save();
+            }
+            _txtRecord.text = "Record : " + PlayerPrefs.GetInt("Record").ToString();
+            
             _buttonMenu.onClick.AddListener(OnMenuClick);
             _buttonQuitter.onClick.AddListener(OnQuitterClick);
             _txtScoreFin.text = "Votre pointage : " + GameManager.Instance.Score.ToString();
@@ -46,6 +66,17 @@ public class UIStartEnd : MonoBehaviour
 #else
         Application.Quit();
 #endif
+    }
+
+    public void OnResetRecordClick()
+    {
+        PlayerPrefs.DeleteKey("Record");
+        PlayerPrefs.Save();
+    }
+
+    public void OnMusicOnOffClick()
+    {
+        BGMusic.Instance.ToggleMusicOnOff();
     }
 
     public void OnDemarrerClick()
